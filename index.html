@@ -267,9 +267,44 @@
     .label-visible {
       opacity: 1 !important;
     }
+
+    #loading-screen {
+      position: fixed;
+      inset: 0;
+      background: #000;
+      z-index: 2000;
+      transition: opacity 1s ease;
+    }
+
+    #loading-screen.fade-out {
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    #loading-text {
+      position: absolute;
+      bottom: 24px;
+      right: 24px;
+      font-family: 'Notable', sans-serif;
+      font-size: 14px;
+      color: #998a5a;
+      letter-spacing: 0.2em;
+    }
+
+    @keyframes blink-dots {
+      0%, 100% { opacity: 1; }
+      50%       { opacity: 0; }
+    }
+
+    #loading-dots {
+      animation: blink-dots 1s step-end infinite;
+    }
   </style>
 </head>
 <body>
+  <div id="loading-screen">
+    <div id="loading-text">LOADING<span id="loading-dots">...</span></div>
+  </div>
   <div class="noise"></div>
   <div class="corner-label">CARLIU</div>
   <div class="corner-label-right">MISSION: PREPARING...</div>
@@ -312,6 +347,12 @@
     </div>
   </div>
   <script>
+    window.addEventListener('load', function() {
+      const screen = document.getElementById('loading-screen');
+      screen.classList.add('fade-out');
+      setTimeout(() => screen.remove(), 1000);
+    });
+
     document.addEventListener('click', function handler() {
       document.querySelector('.typewriter').classList.add('active');
       document.querySelector('.typewriter2').classList.add('active');
