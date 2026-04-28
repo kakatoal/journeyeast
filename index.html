@@ -6,11 +6,7 @@
   <title>Journey East</title>
   <link href="https://fonts.googleapis.com/css2?family=Notable&family=Bebas+Neue&display=swap" rel="stylesheet" />
   <style>
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
 
     body {
       width: 100vw;
@@ -19,14 +15,23 @@
       background: #000;
     }
 
-    .scene {
-      position: relative;
+    /* ── Scene wrapper ── */
+    .scene-wrap {
+      position: fixed;
+      inset: 0;
       width: 100%;
       height: 100%;
+      transition: opacity 1.5s ease;
     }
 
+    .scene-wrap.hidden {
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    /* ── Shared ── */
     .noise {
-      position: fixed;
+      position: absolute;
       inset: 0;
       z-index: 999;
       pointer-events: none;
@@ -46,7 +51,6 @@
       display: flex;
       width: 200%;
       height: 100%;
-      animation: scroll-left 50s linear infinite;
       will-change: transform;
     }
 
@@ -54,7 +58,6 @@
       width: 50%;
       height: 100%;
       flex-shrink: 0;
-      background-image: url('Background com.jpg');
       background-size: 100% 100%;
       background-position: center;
     }
@@ -64,6 +67,9 @@
       to   { transform: translateX(-50%); }
     }
 
+    /* ── Scene 1 specific ── */
+    #s1-track { animation: scroll-left 50s linear infinite; }
+    .s1-bg    { background-image: url('Background com.jpg'); }
 
     .ship-container {
       position: absolute;
@@ -150,8 +156,9 @@
       border: 2px solid #998a5a;
     }
 
+    /* ── Scene 1 UI labels ── */
     .typewriter {
-      position: fixed;
+      position: absolute;
       bottom: 20px;
       left: 48px;
       z-index: 100;
@@ -166,13 +173,11 @@
 
     .typewriter.active {
       border-right: 2px solid #fff;
-      animation:
-        typing 3.5s steps(54, end) forwards,
-        cursor 0.75s step-end infinite;
+      animation: typing 3.5s steps(54, end) forwards, cursor 0.75s step-end infinite;
     }
 
     .typewriter2 {
-      position: fixed;
+      position: absolute;
       bottom: 4px;
       left: 48px;
       z-index: 100;
@@ -187,28 +192,15 @@
 
     .typewriter2.active {
       border-right: 2px solid #fff;
-      animation:
-        typing2 4s steps(51, end) forwards,
-        cursor 0.75s step-end infinite;
+      animation: typing2 4s steps(51, end) forwards, cursor 0.75s step-end infinite;
     }
 
-    @keyframes typing {
-      from { width: 0; }
-      to   { width: 38.7em; }
-    }
-
-    @keyframes typing2 {
-      from { width: 0; }
-      to   { width: 38.7em; }
-    }
-
-    @keyframes cursor {
-      0%, 100% { border-color: #fff; }
-      50%       { border-color: transparent; }
-    }
+    @keyframes typing  { from { width: 0; } to { width: 38.7em; } }
+    @keyframes typing2 { from { width: 0; } to { width: 38.7em; } }
+    @keyframes cursor  { 0%, 100% { border-color: #fff; } 50% { border-color: transparent; } }
 
     .corner-label {
-      position: fixed;
+      position: absolute;
       top: 50px;
       left: 0px;
       z-index: 100;
@@ -224,7 +216,7 @@
     }
 
     .bottom-right-label {
-      position: fixed;
+      position: absolute;
       bottom: 48px;
       left: 57vw;
       z-index: 100;
@@ -239,7 +231,7 @@
     }
 
     .corner-label-right {
-      position: fixed;
+      position: absolute;
       top: -2px;
       left: calc(100vw - 8px - 16em);
       z-index: 100;
@@ -255,9 +247,7 @@
 
     .corner-label-right.active {
       border-right: 2px solid #fff;
-      animation:
-        typing-top 2s steps(21, end) forwards,
-        cursor 0.75s step-end infinite;
+      animation: typing-top 2s steps(21, end) forwards, cursor 0.75s step-end infinite;
     }
 
     .corner-label-right.complete {
@@ -271,19 +261,31 @@
       transition: opacity 0.8s ease;
     }
 
-    .corner-label-right.complete.show {
-      opacity: 1;
+    .corner-label-right.complete.show { opacity: 1; }
+
+    @keyframes typing-top { from { width: 0; } to { width: 16em; } }
+
+    .label-visible { opacity: 1 !important; }
+
+    /* ── Scene 2 specific ── */
+    .s2-bg { background-image: url('Scene2 Background.jpg'); background-size: 100% 100%; }
+
+    .s2-ui {
+      position: absolute;
+      z-index: 100;
     }
 
-    @keyframes typing-top {
-      from { width: 0; }
-      to   { width: 16em; }
+    /* ── Warp flash overlay ── */
+    #warp-flash {
+      position: fixed;
+      inset: 0;
+      background: #fff;
+      opacity: 0;
+      pointer-events: none;
+      z-index: 1500;
     }
 
-    .label-visible {
-      opacity: 1 !important;
-    }
-
+    /* ── Loading screen ── */
     #loading-screen {
       position: fixed;
       inset: 0;
@@ -321,14 +323,11 @@
       color: #e8e0cc;
       letter-spacing: 0.04em;
       line-height: 1.05;
-      margin-bottom: 0;
       opacity: 0;
       transition: opacity 1.2s ease;
     }
 
-    .story-line.visible {
-      opacity: 1;
-    }
+    .story-line.visible { opacity: 1; }
 
     #click-hint {
       position: absolute;
@@ -342,26 +341,17 @@
       transition: opacity 1s ease;
     }
 
-    #click-hint.visible {
-      animation: blink-hint 1.5s step-end infinite;
-    }
+    #click-hint.visible { animation: blink-hint 1.5s step-end infinite; }
 
-    @keyframes blink-hint {
-      0%, 100% { opacity: 1; }
-      50%       { opacity: 0.2; }
-    }
+    @keyframes blink-hint { 0%, 100% { opacity: 1; } 50% { opacity: 0.2; } }
+    @keyframes blink-dots { 0%, 100% { opacity: 1; } 50% { opacity: 0.2; } }
 
-    @keyframes blink-dots {
-      0%, 100% { opacity: 1; }
-      50%       { opacity: 0.2; }
-    }
-
-    #loading-dots {
-      animation: blink-dots 1s step-end infinite;
-    }
+    #loading-dots { animation: blink-dots 1s step-end infinite; }
   </style>
 </head>
 <body>
+
+  <!-- Loading / Intro screen -->
   <div id="loading-screen">
     <div id="story-intro">
       <span class="story-line" data-delay="1000">ONE DAY, DURING MY ROUTINE PATROL, I DETECTED A SIGNAL FROM AN UNUSUAL <span style="color:#95471f">PLANET</span>.</span>
@@ -371,59 +361,112 @@
     <div id="click-hint">— CLICK TO CONTINUE —</div>
     <div id="loading-indicator">LOADING<span id="loading-dots">...</span></div>
   </div>
-  <div class="noise"></div>
-  <div class="corner-label">CARLIU</div>
-  <div class="corner-label-right">MISSION: PREPARING...</div>
-  <div class="bottom-right-label"><span style="display:inline-block;width:18px;height:18px;background:#5c6b3f;vertical-align:middle;margin-right:12px;margin-bottom:6px;"></span>JOURNEY EASTWARD</div>
-  <div class="typewriter">2777.03.03 &nbsp; LOCATION: MILKY WAY GALAXY &nbsp; 8088.8388.8888</div>
-  <div class="typewriter2">DESTINATION: WESTERN PLANET (CODE: OLD WEST PLANET)</div>
-  <div class="scene">
-    <div class="ship-container">
-      <svg class="radials" viewBox="0 0 100 100">
-        <line x1="50" y1="50" x2="100"  y2="50"   stroke="#f0f0f0" stroke-width="0.12"/>
-        <line x1="50" y1="50" x2="96.2" y2="69.1" stroke="#f0f0f0" stroke-width="0.12"/>
-        <line x1="50" y1="50" x2="85.4" y2="85.4" stroke="#f0f0f0" stroke-width="0.12"/>
-        <line x1="50" y1="50" x2="69.1" y2="96.2" stroke="#f0f0f0" stroke-width="0.12"/>
-        <line x1="50" y1="50" x2="50"   y2="100"  stroke="#f0f0f0" stroke-width="0.12"/>
-        <line x1="50" y1="50" x2="30.9" y2="96.2" stroke="#f0f0f0" stroke-width="0.12"/>
-        <line x1="50" y1="50" x2="14.6" y2="85.4" stroke="#f0f0f0" stroke-width="0.12"/>
-        <line x1="50" y1="50" x2="3.8"  y2="69.1" stroke="#f0f0f0" stroke-width="0.12"/>
-        <line x1="50" y1="50" x2="0"    y2="50"   stroke="#f0f0f0" stroke-width="0.12"/>
-        <line x1="50" y1="50" x2="3.8"  y2="30.9" stroke="#f0f0f0" stroke-width="0.12"/>
-        <line x1="50" y1="50" x2="14.6" y2="14.6" stroke="#f0f0f0" stroke-width="0.12"/>
-        <line x1="50" y1="50" x2="30.9" y2="3.8"  stroke="#f0f0f0" stroke-width="0.12"/>
-        <line x1="50" y1="50" x2="50"   y2="0"    stroke="#f0f0f0" stroke-width="0.12"/>
-        <line x1="50" y1="50" x2="69.1" y2="3.8"  stroke="#f0f0f0" stroke-width="0.12"/>
-        <line x1="50" y1="50" x2="85.4" y2="14.6" stroke="#f0f0f0" stroke-width="0.12"/>
-        <line x1="50" y1="50" x2="96.2" y2="30.9" stroke="#f0f0f0" stroke-width="0.12"/>
-      </svg>
-      <div class="orbit"></div>
-      <div class="orbit-inner"></div>
-      <div class="satellite-wrap">
-        <div class="satellite-ring"></div>
-        <div class="satellite">※</div>
-      </div>
-      <img class="ship" src="Final ship!.png" alt="ship" />
+
+  <!-- Warp flash -->
+  <div id="warp-flash"></div>
+
+  <!-- ════ SCENE 1 ════ -->
+  <div id="scene-1" class="scene-wrap">
+    <div class="noise"></div>
+    <div class="corner-label">CARLIU</div>
+    <div class="corner-label-right">MISSION: PREPARING...</div>
+    <div class="bottom-right-label">
+      <span style="display:inline-block;width:18px;height:18px;background:#5c6b3f;vertical-align:middle;margin-right:12px;margin-bottom:6px;"></span>JOURNEY EASTWARD
     </div>
-    <div class="bg-layer">
-      <div class="bg-track">
-        <div class="bg-img"></div>
-        <div class="bg-img"></div>
+    <div class="typewriter">2777.03.03 &nbsp; LOCATION: MILKY WAY GALAXY &nbsp; 8088.8388.8888</div>
+    <div class="typewriter2">DESTINATION: WESTERN PLANET (CODE: OLD WEST PLANET)</div>
+
+    <div style="position:relative;width:100%;height:100%;">
+      <div class="ship-container">
+        <svg class="radials" viewBox="0 0 100 100">
+          <line x1="50" y1="50" x2="100"  y2="50"   stroke="#f0f0f0" stroke-width="0.12"/>
+          <line x1="50" y1="50" x2="96.2" y2="69.1" stroke="#f0f0f0" stroke-width="0.12"/>
+          <line x1="50" y1="50" x2="85.4" y2="85.4" stroke="#f0f0f0" stroke-width="0.12"/>
+          <line x1="50" y1="50" x2="69.1" y2="96.2" stroke="#f0f0f0" stroke-width="0.12"/>
+          <line x1="50" y1="50" x2="50"   y2="100"  stroke="#f0f0f0" stroke-width="0.12"/>
+          <line x1="50" y1="50" x2="30.9" y2="96.2" stroke="#f0f0f0" stroke-width="0.12"/>
+          <line x1="50" y1="50" x2="14.6" y2="85.4" stroke="#f0f0f0" stroke-width="0.12"/>
+          <line x1="50" y1="50" x2="3.8"  y2="69.1" stroke="#f0f0f0" stroke-width="0.12"/>
+          <line x1="50" y1="50" x2="0"    y2="50"   stroke="#f0f0f0" stroke-width="0.12"/>
+          <line x1="50" y1="50" x2="3.8"  y2="30.9" stroke="#f0f0f0" stroke-width="0.12"/>
+          <line x1="50" y1="50" x2="14.6" y2="14.6" stroke="#f0f0f0" stroke-width="0.12"/>
+          <line x1="50" y1="50" x2="30.9" y2="3.8"  stroke="#f0f0f0" stroke-width="0.12"/>
+          <line x1="50" y1="50" x2="50"   y2="0"    stroke="#f0f0f0" stroke-width="0.12"/>
+          <line x1="50" y1="50" x2="69.1" y2="3.8"  stroke="#f0f0f0" stroke-width="0.12"/>
+          <line x1="50" y1="50" x2="85.4" y2="14.6" stroke="#f0f0f0" stroke-width="0.12"/>
+          <line x1="50" y1="50" x2="96.2" y2="30.9" stroke="#f0f0f0" stroke-width="0.12"/>
+        </svg>
+        <div class="orbit"></div>
+        <div class="orbit-inner"></div>
+        <div class="satellite-wrap">
+          <div class="satellite-ring"></div>
+          <div class="satellite">※</div>
+        </div>
+        <img class="ship" src="Final ship!.png" alt="ship" />
+      </div>
+      <div class="bg-layer">
+        <div id="s1-track" class="bg-track">
+          <div class="bg-img s1-bg"></div>
+          <div class="bg-img s1-bg"></div>
+        </div>
       </div>
     </div>
   </div>
+
+  <!-- ════ SCENE 2 ════ -->
+  <div id="scene-2" class="scene-wrap hidden">
+    <div class="noise"></div>
+
+    <!-- 在这里添加第二场景的UI元素 -->
+
+    <div style="position:relative;width:100%;height:100%;">
+      <div class="bg-layer">
+        <div id="s2-track" class="bg-track">
+          <div class="bg-img s2-bg"></div>
+          <div class="bg-img s2-bg"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <script>
+    /* ── Scene transition ── */
+    function transitionToScene(toId) {
+      const flash = document.getElementById('warp-flash');
+
+      flash.style.transition = 'opacity 0.3s linear';
+      flash.style.opacity = '1';
+
+      setTimeout(function() {
+        document.querySelectorAll('.scene-wrap').forEach(s => {
+          s.style.transition = 'none';
+          s.classList.add('hidden');
+        });
+        const next = document.getElementById(toId);
+        next.style.transition = 'none';
+        next.style.opacity = '0';
+        next.classList.remove('hidden');
+
+        requestAnimationFrame(() => requestAnimationFrame(() => {
+          flash.style.transition = 'opacity 1.4s ease';
+          flash.style.opacity = '0';
+          next.style.transition = 'opacity 1.4s ease';
+          next.style.opacity = '1';
+        }));
+      }, 300);
+    }
+
+    /* ── Loading screen ── */
     window.addEventListener('load', function() {
       const indicator = document.getElementById('loading-indicator');
-      const hint = document.getElementById('click-hint');
+      const hint      = document.getElementById('click-hint');
       const loadingScreen = document.getElementById('loading-screen');
-      const lines = document.querySelectorAll('.story-line');
+      const lines     = document.querySelectorAll('.story-line');
 
       indicator.style.display = 'none';
 
       lines.forEach(function(line) {
-        const delay = parseInt(line.getAttribute('data-delay'));
-        setTimeout(() => line.classList.add('visible'), delay);
+        setTimeout(() => line.classList.add('visible'), parseInt(line.getAttribute('data-delay')));
       });
 
       const lastDelay = parseInt(lines[lines.length - 1].getAttribute('data-delay'));
@@ -434,10 +477,17 @@
         setTimeout(() => loadingScreen.remove(), 1200);
         loadingScreen.removeEventListener('click', onIntroClick);
 
+        /* Scene 1 UI 启动 */
         document.querySelector('.typewriter').classList.add('active');
         document.querySelector('.typewriter2').classList.add('active');
         document.querySelector('.corner-label-right').classList.add('active');
 
+        setTimeout(function() {
+          document.querySelector('.corner-label').classList.add('label-visible');
+          document.querySelector('.bottom-right-label').classList.add('label-visible');
+        }, 1200);
+
+        /* MISSION → PREPARATION COMPLETE */
         setTimeout(function() {
           const el = document.querySelector('.corner-label-right');
           el.style.transition = 'opacity 0.6s ease';
@@ -448,45 +498,51 @@
             el.style.transition = '';
             el.classList.add('complete');
             el.textContent = 'PREPARATION COMPLETE: CLICK TO WARP';
-            requestAnimationFrame(function() {
-              requestAnimationFrame(function() {
-                el.classList.add('show');
-              });
-            });
+            requestAnimationFrame(() => requestAnimationFrame(() => el.classList.add('show')));
           }, 700);
         }, 5000);
 
+        /* 等文字变完后，监听跃迁点击 */
         setTimeout(function() {
           document.addEventListener('click', function warpHandler() {
-            const track = document.querySelector('.bg-track');
+            document.removeEventListener('click', warpHandler);
+
+            const track = document.getElementById('s1-track');
             const halfWidth = window.innerWidth;
             let position = track.getBoundingClientRect().left;
             const slowSpeed = halfWidth / (50 * 60);
             const fastSpeed = halfWidth / (3 * 60);
             let speed = slowSpeed;
             let lastTime = null;
+            let warpStartTime = null;
+            let transitioned = false;
 
             track.style.animation = 'none';
             track.style.transform = `translateX(${position}px)`;
 
             function warpFrame(timestamp) {
               if (!lastTime) lastTime = timestamp;
+              if (!warpStartTime) warpStartTime = timestamp;
               const delta = Math.min((timestamp - lastTime) / 16.67, 3);
               lastTime = timestamp;
+
               speed += (fastSpeed - speed) * 0.018 * delta;
               position -= speed * delta;
               if (position <= -halfWidth) position += halfWidth;
               track.style.transform = `translateX(${position}px)`;
+
+              /* 加速 3 秒后跳转场景 */
+              if (!transitioned && timestamp - warpStartTime > 3000) {
+                transitioned = true;
+                transitionToScene('scene-2');
+              }
+
               requestAnimationFrame(warpFrame);
             }
+
             requestAnimationFrame(warpFrame);
-            document.removeEventListener('click', warpHandler);
           });
         }, 5900);
-        setTimeout(function() {
-          document.querySelector('.corner-label').classList.add('label-visible');
-          document.querySelector('.bottom-right-label').classList.add('label-visible');
-        }, 1200);
       });
     });
   </script>
