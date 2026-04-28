@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Journey East</title>
-  <link href="https://fonts.googleapis.com/css2?family=Notable&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Notable&family=Bebas+Neue&display=swap" rel="stylesheet" />
   <style>
     * {
       margin: 0;
@@ -47,6 +47,7 @@
       width: 200%;
       height: 100%;
       animation: scroll-left 50s linear infinite;
+      will-change: transform;
     }
 
     .bg-img {
@@ -259,6 +260,21 @@
         cursor 0.75s step-end infinite;
     }
 
+    .corner-label-right.complete {
+      left: auto !important;
+      right: 8px;
+      width: auto;
+      overflow: visible;
+      border-right: none;
+      animation: none;
+      opacity: 0;
+      transition: opacity 0.8s ease;
+    }
+
+    .corner-label-right.complete.show {
+      opacity: 1;
+    }
+
     @keyframes typing-top {
       from { width: 0; }
       to   { width: 16em; }
@@ -273,7 +289,7 @@
       inset: 0;
       background: #000;
       z-index: 2000;
-      transition: opacity 1s ease;
+      transition: opacity 1.2s ease;
     }
 
     #loading-screen.fade-out {
@@ -281,19 +297,63 @@
       pointer-events: none;
     }
 
-    #loading-text {
+    #loading-indicator {
       position: absolute;
       bottom: 24px;
-      right: 24px;
+      left: 48px;
       font-family: 'Notable', sans-serif;
-      font-size: 14px;
+      font-size: 13px;
       color: #998a5a;
       letter-spacing: 0.2em;
     }
 
+    #story-intro {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+    }
+
+    .story-line {
+      display: block;
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 4.5vw;
+      color: #e8e0cc;
+      letter-spacing: 0.04em;
+      line-height: 1.05;
+      margin-bottom: 0;
+      opacity: 0;
+      transition: opacity 1.2s ease;
+    }
+
+    .story-line.visible {
+      opacity: 1;
+    }
+
+    #click-hint {
+      position: absolute;
+      bottom: 24px;
+      right: 48px;
+      font-family: 'Notable', sans-serif;
+      font-size: 12px;
+      color: #998a5a;
+      letter-spacing: 0.3em;
+      opacity: 0;
+      transition: opacity 1s ease;
+    }
+
+    #click-hint.visible {
+      animation: blink-hint 1.5s step-end infinite;
+    }
+
+    @keyframes blink-hint {
+      0%, 100% { opacity: 1; }
+      50%       { opacity: 0.2; }
+    }
+
     @keyframes blink-dots {
       0%, 100% { opacity: 1; }
-      50%       { opacity: 0; }
+      50%       { opacity: 0.2; }
     }
 
     #loading-dots {
@@ -303,7 +363,13 @@
 </head>
 <body>
   <div id="loading-screen">
-    <div id="loading-text">LOADING<span id="loading-dots">...</span></div>
+    <div id="story-intro">
+      <span class="story-line" data-delay="1000">ONE DAY, DURING MY ROUTINE PATROL, I DETECTED A SIGNAL FROM AN UNUSUAL <span style="color:#95471f">PLANET</span>.</span>
+      <span class="story-line" data-delay="4500">THE <span style="color:#95471f">PLANET</span> RADIATED A STRIKING, EARTHY RED FROM ITS SURFACE.</span>
+      <span class="story-line" data-delay="8000">TEMPTED, I MADE THE DECISION TO FLY IN AND EXPLORE.</span>
+    </div>
+    <div id="click-hint">— CLICK TO CONTINUE —</div>
+    <div id="loading-indicator">LOADING<span id="loading-dots">...</span></div>
   </div>
   <div class="noise"></div>
   <div class="corner-label">CARLIU</div>
@@ -348,18 +414,80 @@
   </div>
   <script>
     window.addEventListener('load', function() {
-      const screen = document.getElementById('loading-screen');
-      screen.classList.add('fade-out');
-      setTimeout(() => screen.remove(), 1000);
-    });
+      const indicator = document.getElementById('loading-indicator');
+      const hint = document.getElementById('click-hint');
+      const loadingScreen = document.getElementById('loading-screen');
+      const lines = document.querySelectorAll('.story-line');
 
-    document.addEventListener('click', function handler() {
-      document.querySelector('.typewriter').classList.add('active');
-      document.querySelector('.typewriter2').classList.add('active');
-      document.querySelector('.corner-label').classList.add('label-visible');
-      document.querySelector('.corner-label-right').classList.add('active');
-      document.querySelector('.bottom-right-label').classList.add('label-visible');
-      document.removeEventListener('click', handler);
+      indicator.style.display = 'none';
+
+      lines.forEach(function(line) {
+        const delay = parseInt(line.getAttribute('data-delay'));
+        setTimeout(() => line.classList.add('visible'), delay);
+      });
+
+      const lastDelay = parseInt(lines[lines.length - 1].getAttribute('data-delay'));
+      setTimeout(() => hint.classList.add('visible'), lastDelay + 1400);
+
+      loadingScreen.addEventListener('click', function onIntroClick() {
+        loadingScreen.classList.add('fade-out');
+        setTimeout(() => loadingScreen.remove(), 1200);
+        loadingScreen.removeEventListener('click', onIntroClick);
+
+        document.querySelector('.typewriter').classList.add('active');
+        document.querySelector('.typewriter2').classList.add('active');
+        document.querySelector('.corner-label-right').classList.add('active');
+
+        setTimeout(function() {
+          const el = document.querySelector('.corner-label-right');
+          el.style.transition = 'opacity 0.6s ease';
+          el.style.opacity = '0';
+          setTimeout(function() {
+            el.classList.remove('active');
+            el.style.opacity = '';
+            el.style.transition = '';
+            el.classList.add('complete');
+            el.textContent = 'PREPARATION COMPLETE: CLICK TO WARP';
+            requestAnimationFrame(function() {
+              requestAnimationFrame(function() {
+                el.classList.add('show');
+              });
+            });
+          }, 700);
+        }, 5000);
+
+        setTimeout(function() {
+          document.addEventListener('click', function warpHandler() {
+            const track = document.querySelector('.bg-track');
+            const halfWidth = window.innerWidth;
+            let position = track.getBoundingClientRect().left;
+            const slowSpeed = halfWidth / (50 * 60);
+            const fastSpeed = halfWidth / (3 * 60);
+            let speed = slowSpeed;
+            let lastTime = null;
+
+            track.style.animation = 'none';
+            track.style.transform = `translateX(${position}px)`;
+
+            function warpFrame(timestamp) {
+              if (!lastTime) lastTime = timestamp;
+              const delta = Math.min((timestamp - lastTime) / 16.67, 3);
+              lastTime = timestamp;
+              speed += (fastSpeed - speed) * 0.018 * delta;
+              position -= speed * delta;
+              if (position <= -halfWidth) position += halfWidth;
+              track.style.transform = `translateX(${position}px)`;
+              requestAnimationFrame(warpFrame);
+            }
+            requestAnimationFrame(warpFrame);
+            document.removeEventListener('click', warpHandler);
+          });
+        }, 5900);
+        setTimeout(function() {
+          document.querySelector('.corner-label').classList.add('label-visible');
+          document.querySelector('.bottom-right-label').classList.add('label-visible');
+        }, 1200);
+      });
     });
   </script>
 </body>
