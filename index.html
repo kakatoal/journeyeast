@@ -417,7 +417,7 @@
   <div id="scene-2" class="scene-wrap hidden">
     <div class="noise"></div>
 
-    <!-- 在这里添加第二场景的UI元素 -->
+    <!-- 在这里添加第二场景的UI元素 second scene's ui elements:-->
 
     <div style="position:relative;width:100%;height:100%;">
       <div class="bg-layer">
@@ -477,7 +477,7 @@
         setTimeout(() => loadingScreen.remove(), 1200);
         loadingScreen.removeEventListener('click', onIntroClick);
 
-        /* Scene 1 UI 启动 */
+        /* Scene 1 UI start */
         document.querySelector('.typewriter').classList.add('active');
         document.querySelector('.typewriter2').classList.add('active');
         document.querySelector('.corner-label-right').classList.add('active');
@@ -502,7 +502,7 @@
           }, 700);
         }, 5000);
 
-        /* 等文字变完后，监听跃迁点击 */
+        /* 等文字变完后，监听跃迁点击:when all of texts show up, click the screen and then changing to the third scene */
         setTimeout(function() {
           document.addEventListener('click', function warpHandler() {
             document.removeEventListener('click', warpHandler);
@@ -531,7 +531,7 @@
               if (position <= -halfWidth) position += halfWidth;
               track.style.transform = `translateX(${position}px)`;
 
-              /* 加速 3 秒后跳转场景 */
+              /* 加速 3 秒后跳转场景 :increasing tbackground moving and wrap*/
               if (!transitioned && timestamp - warpStartTime > 3000) {
                 transitioned = true;
                 transitionToScene('scene-2');
