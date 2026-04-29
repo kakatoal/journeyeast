@@ -270,6 +270,18 @@
     /* ── Scene 2 specific ── */
     .s2-bg { background-image: url('Scene2 Background.jpg'); background-size: 100% 100%; }
 
+    .s2-planet {
+      position: absolute;
+      width: 120vh;
+      height: 120vh;
+      border-radius: 50%;
+      background: #95471f;
+      right: -42vh;
+      top: 50%;
+      transform: translateY(-50%);
+      z-index: 10;
+    }
+
     .s2-ui {
       position: absolute;
       z-index: 100;
@@ -413,11 +425,11 @@
     </div>
   </div>
 
-  <!-- ════ SCENE 2 ════ -->
+  <!-- ════ 场景2 SCENE 2 ════ -->
   <div id="scene-2" class="scene-wrap hidden">
     <div class="noise"></div>
 
-    <!-- 在这里添加第二场景的UI元素 second scene's ui elements:-->
+    <div class="s2-planet"></div>
 
     <div style="position:relative;width:100%;height:100%;">
       <div class="bg-layer">
@@ -432,6 +444,7 @@
   <script>
     /* ── Scene transition ── */
     function transitionToScene(toId) {
+      sessionStorage.setItem('currentScene', toId);
       const flash = document.getElementById('warp-flash');
 
       flash.style.transition = 'opacity 0.3s linear';
@@ -458,6 +471,19 @@
 
     /* ── Loading screen ── */
     window.addEventListener('load', function() {
+      const savedScene = sessionStorage.getItem('currentScene');
+      if (savedScene && savedScene !== 'scene-1') {
+        document.getElementById('loading-screen').style.display = 'none';
+        document.querySelectorAll('.scene-wrap').forEach(s => {
+          s.style.transition = 'none';
+          s.classList.add('hidden');
+        });
+        const target = document.getElementById(savedScene);
+        target.style.transition = 'none';
+        target.style.opacity = '1';
+        target.classList.remove('hidden');
+        return;
+      }
       const indicator = document.getElementById('loading-indicator');
       const hint      = document.getElementById('click-hint');
       const loadingScreen = document.getElementById('loading-screen');
