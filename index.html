@@ -419,6 +419,16 @@
     #s6-head-word{color:#ffe066;cursor:pointer;display:inline;}
     @keyframes s6HeadBlink{0%,49%{opacity:1}50%,100%{opacity:0}}
     #s6-head-word.blinking{animation:s6HeadBlink 0.65s step-end infinite;}
+    /* ── Scene 8 CRT screen ── */
+    #s8-wrap{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);
+      width:54vw;z-index:5;}
+    @keyframes s8spin{to{transform:translate(-50%,-50%) rotate(360deg);}}
+    #s8-screen{position:relative;overflow:hidden;}
+    #s8-screen video{width:100%;height:auto;display:block;}
+    #s8-scanlines{position:absolute;inset:0;z-index:2;pointer-events:none;
+      background:repeating-linear-gradient(0deg,transparent,transparent 3px,rgba(0,0,0,0.12) 3px,rgba(0,0,0,0.12) 4px);}
+    #s8-glare{position:absolute;inset:0;z-index:3;pointer-events:none;
+      background:radial-gradient(ellipse 55% 45% at 36% 26%,rgba(255,255,255,0.09) 0%,transparent 65%);}
     .s7-line{font-family:'Notable',sans-serif;font-size:clamp(0.85rem,1.3vw,1.3rem);color:#000;letter-spacing:0.12em;line-height:1.9;margin:0;opacity:0;transform:translateY(10px);transition:opacity 0.9s ease,transform 0.9s ease;white-space:nowrap;text-align:center;}
     .s7-line.vis{opacity:1;transform:translateY(0);}
     @keyframes s7shk1{0%,49.9%{opacity:1}50%,100%{opacity:0}}
@@ -1138,9 +1148,20 @@
     </video>
   </div>
 
+  <!-- ════ SCENE 8 ════ -->
+  <div id="scene-8" class="scene-wrap hidden" style="background:#000;overflow:hidden;">
+    <div id="s8-wrap">
+      <div id="s8-screen">
+        <video src="final video.mp4" autoplay muted playsinline loop></video>
+        <div id="s8-scanlines"></div>
+        <div id="s8-glare"></div>
+      </div>
+    </div>
+  </div>
+
   <script>
     /* ── Scene nav ── */
-    const sceneOrder = ['scene-1', 'scene-2', 'scene-3', 'scene-4', 'scene-5', 'scene-6', 'scene-7'];
+    const sceneOrder = ['scene-1', 'scene-2', 'scene-3', 'scene-4', 'scene-5', 'scene-6', 'scene-7', 'scene-8'];
     let currentSceneIndex = 0;
     let warpRunning = false;
 
@@ -3287,6 +3308,73 @@ function draw(ts){
       }).observe(s7,{attributes:true,attributeFilter:['class']});
       window.addEventListener('resize',function(){if(rafId)resize();});
       if(!s7.classList.contains('hidden'))start();
+    })();
+
+
+    /* ── Scene 7 → 8 blink transition ── */
+    (function(){
+      var s7=document.getElementById('scene-7');
+      var busy=false;
+
+      function makeLids(){
+        var base='position:fixed;left:0;width:100%;height:50%;background:#000;z-index:99998;';
+        var t=document.createElement('div');
+        var b=document.createElement('div');
+        t.style.cssText=base+'top:0;transform:translateY(-100%);will-change:transform;';
+        b.style.cssText=base+'bottom:0;transform:translateY(100%);will-change:transform;';
+        document.body.appendChild(t);
+        document.body.appendChild(b);
+        return {t:t,b:b};
+      }
+
+      function setLids(lids,closed,dur,cb){
+        lids.t.style.transition='transform '+dur+'ms ease';
+        lids.b.style.transition='transform '+dur+'ms ease';
+        lids.t.style.transform=closed?'translateY(0)':'translateY(-100%)';
+        lids.b.style.transform=closed?'translateY(0)':'translateY(100%)';
+        setTimeout(cb,dur);
+      }
+
+      var s7Lines=document.querySelectorAll('.s7-line');
+      var s7LastLine=s7Lines[s7Lines.length-1];
+
+      s7.addEventListener('click',function(e){
+        var id=e.target.id||'';
+        if(id==='s7-eyes-l'||id==='s7-eyes-r') return;
+        if(busy) return;
+        if(!s7LastLine||!s7LastLine.classList.contains('vis')) return;
+        busy=true;
+        var lids=makeLids();
+        /* 眨 1 */
+        setTimeout(function(){
+          setLids(lids,true,130,function(){
+            setTimeout(function(){
+              setLids(lids,false,110,function(){
+                /* 眨 2 */
+                setTimeout(function(){
+                  setLids(lids,true,120,function(){
+                    setTimeout(function(){
+                      setLids(lids,false,100,function(){
+                        /* 眨 3 — 合上后切场景 */
+                        setTimeout(function(){
+                          setLids(lids,true,140,function(){
+                            fadeToScene(sceneOrder.indexOf('scene-8'));
+                            setTimeout(function(){
+                              setLids(lids,false,220,function(){
+                                lids.t.remove();lids.b.remove();busy=false;
+                              });
+                            },350);
+                          });
+                        },70);
+                      });
+                    },70);
+                  });
+                },80);
+              });
+            },40);
+          });
+        },60);
+      });
     })();
 
     /* ── Scene 7 text lines ── */
