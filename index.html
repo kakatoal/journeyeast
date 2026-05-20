@@ -419,6 +419,8 @@
     #s6-head-word{color:#ffe066;cursor:pointer;display:inline;}
     @keyframes s6HeadBlink{0%,49%{opacity:1}50%,100%{opacity:0}}
     #s6-head-word.blinking{animation:s6HeadBlink 0.65s step-end infinite;}
+    .s7-line{font-family:'Notable',sans-serif;font-size:clamp(0.85rem,1.3vw,1.3rem);color:#000;letter-spacing:0.12em;line-height:1.9;margin:0;opacity:0;transform:translateY(10px);transition:opacity 0.9s ease,transform 0.9s ease;white-space:nowrap;text-align:center;}
+    .s7-line.vis{opacity:1;transform:translateY(0);}
     @keyframes s7shk1{0%,49.9%{opacity:1}50%,100%{opacity:0}}
     @keyframes s7shk2{0%,49.9%{opacity:0}50%,100%{opacity:1}}
     #s7-shk1{animation:s7shk1 0.12s step-end infinite;}
@@ -1119,6 +1121,13 @@
     <canvas id="s7-neuro" style="position:absolute;inset:0;width:100%;height:100%;z-index:2;pointer-events:none;"></canvas>
     <img id="s7-shk1" src="shaking1.png" style="position:absolute;z-index:6;width:100vw;top:50%;left:50%;transform:translate(-50%,-50%);pointer-events:none;">
     <img id="s7-shk2" src="shaking2.png" style="position:absolute;z-index:6;width:100vw;top:50%;left:50%;transform:translate(-50%,-50%);pointer-events:none;">
+    <div id="s7-text" style="position:absolute;z-index:7;top:56.5%;left:50%;transform:translateX(-50%);pointer-events:none;">
+      <p class="s7-line">MY BRAIN CONVULSED IN WAVES.</p>
+      <p class="s7-line">I FELT LIKE I WAS ABOUT TO DIE.</p>
+      <p class="s7-line">I CLOSED MY EYES.</p>
+      <p class="s7-line">VISIONS BEGAN TO EMERGE FROM WITHIN MY MIND:</p>
+      <p class="s7-line">OF MY ANCESTORS' CENTURIES.</p>
+    </div>
     <video id="s7-eyes-l" src="eyesblinkiing.mp4" autoplay muted playsinline loop
       style="position:absolute;z-index:5;width:6vw;top:45%;left:44%;
              transform:translate(-50%,-50%);cursor:grab;">
@@ -3278,6 +3287,31 @@ function draw(ts){
       }).observe(s7,{attributes:true,attributeFilter:['class']});
       window.addEventListener('resize',function(){if(rafId)resize();});
       if(!s7.classList.contains('hidden'))start();
+    })();
+
+    /* ── Scene 7 text lines ── */
+    (function(){
+      var s7=document.getElementById('scene-7');
+      var lines=Array.from(document.querySelectorAll('.s7-line'));
+      var timers=[];
+      var delays=[1200,2800,4200,5600,7400];
+
+      function startText(){
+        lines.forEach(function(l){l.classList.remove('vis');});
+        timers.forEach(clearTimeout);
+        timers=delays.map(function(d,i){
+          return setTimeout(function(){lines[i].classList.add('vis');},d);
+        });
+      }
+      function stopText(){
+        timers.forEach(clearTimeout);
+        lines.forEach(function(l){l.classList.remove('vis');});
+      }
+
+      new MutationObserver(function(){
+        if(!s7.classList.contains('hidden'))startText();else stopText();
+      }).observe(s7,{attributes:true,attributeFilter:['class']});
+      if(!s7.classList.contains('hidden'))startText();
     })();
 
     /* ── Scene 7 draggable eyes ── */
