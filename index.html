@@ -3543,7 +3543,18 @@ function draw(ts){
         muts.forEach(function(m){
           if(m.attributeName==='class'){
             if(!s8.classList.contains('hidden')){
+              /* scene became visible — reset everything and play from start */
               nav.classList.remove('visible');
+              vid.currentTime = 0;
+              vid.classList.remove('fade-out');
+              letter.style.opacity = '1';
+              ending.classList.remove('vis');
+              ending.style.opacity = '';
+              endLine.style.opacity = '0';
+              vid.play();
+            } else {
+              /* scene hidden — pause video to stop background playback */
+              vid.pause();
             }
           }
         });
@@ -3561,6 +3572,7 @@ function draw(ts){
       ];
 
       vid.addEventListener('ended', function(){
+        if(document.getElementById('scene-8').classList.contains('hidden')) return;
         vid.classList.add('fade-out');
         nav.classList.add('visible');
         /* wait 5s on letter, then fade it out */
